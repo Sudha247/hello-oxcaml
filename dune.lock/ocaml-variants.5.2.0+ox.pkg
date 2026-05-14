@@ -1,0 +1,4 @@
+(version 5.2.0+ox)
+
+(depends
+ (all_platforms (oxcaml-compiler)))
