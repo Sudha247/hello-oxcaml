@@ -1,7 +1,6 @@
 --- a/Makefile.common-ox
 +++ b/Makefile.common-ox
-@@ -169,10 +169,10 @@ $(ocamldir)/otherlibs/dune:
- 	fi
+@@ -150,9 +150,9 @@ $(ocamldir)/otherlibs/dune:
 
  $(ocamldir)/dune.runtime_selection:
  	if [ "$(RUNTIME_DIR)" = "runtime4" ]; then \
