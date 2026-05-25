@@ -1,0 +1,46 @@
+name: Weekly Build Check
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Every Monday at 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180  # OXcaml compiler is built from source via dune-pkg
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y autoconf
+
+      - uses: ocaml-dune/setup-dune@v2
+
+      - name: Build
+        run: dune build
+
+  report-failure:
+    needs: build
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[CI] Weekly build failed (${date})`,
+              body: [
+                '## Weekly build check failed',
+                '',
+                `**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+                '',
+                'Please check the workflow logs for details.',
+              ].join('\n'),
+            });
